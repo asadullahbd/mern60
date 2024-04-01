@@ -1,33 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import axios from "axios";
+import { useState,useEffect } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
 
+  const [users,setUsers] = useState([]);
+
+  const [name,setName] = useState("");
+  const [age,setAge] = useState(0);
+  const [email,setEmail] = useState("");
+  
+  useEffect( ()=>{
+    axios.get("http://localhost:4000/users")
+    .then((response)=>{
+      setUsers(response.data)
+    })
+  },[])
+  
+  
+  const addUser = (e)=>{
+     (async ()=>{
+      try {
+        await axios.post("http://localhost:4000/addUser",{
+          name ,
+          age,
+          email
+        })
+        .then((response) =>{
+          setUsers([
+            ...users,
+            {
+              name,
+              age,
+              email
+            }
+          ])
+        })
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  };
+  
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {users.map((item,index)=>{
+        return(
+          <div key={index}>
+            <h1>{item.name}</h1>
+            <h1>{item.age}</h1>
+            <h1>{item.email}</h1>
+            <hr />
+          </div>
+        )
+      })}
+
+      <form action="">
+        <input type="text" name="" id="" placeholder="Name..." onChange={(event)=>{setName(event.target.value)}} /> <br/>
+        <input type="number" name="" id="" placeholder="Age..." onChange={(event)=>{setAge(event.target.value)}} /><br/>
+        <input type="email" name="" id="" placeholder="Email..." onChange={(event)=>{setEmail(event.target.value)}} /><br/>
+        <button type="submit" onClick={addUser}>Add User</button>
+      </form>
+      
     </>
   )
 }
